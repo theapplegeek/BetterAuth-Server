@@ -1,7 +1,7 @@
-import {Context, Hono} from 'hono'
-import {cors} from "hono/dist/types/middleware/cors";
+import {type Context, Hono} from 'hono'
 import {config} from "./config/app.config";
 import {auth} from "./auth/auth";
+import {cors} from "hono/cors";
 
 const app = new Hono()
 
