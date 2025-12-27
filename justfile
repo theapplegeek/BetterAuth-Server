@@ -6,3 +6,6 @@ generate-db-migration name:
 
 db-migrate:
     bun x drizzle-kit migrate
+
+db-check:
+    bun x drizzle-kit check
