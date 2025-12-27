@@ -7,6 +7,7 @@ import {db} from "../db/db";
 import * as schema from "../db/schema/auth-schema";
 import {ac, admin, user} from "./permissions";
 import {createAuthMiddleware} from "better-auth/api";
+import {config} from "../config/app.config";
 
 async function sendEmail(to: string, subject: string, html: string) {
   // TODO: plug in nodemailer/resend here
@@ -18,9 +19,9 @@ export const auth = betterAuth({
     provider: "pg",
     schema
   }),
-  trustedOrigins: [process.env.TRUSTED_ORIGIN!],
-  appName: process.env.APP_NAME || "Better Auth Demo",
-  secret: process.env.AUTH_SECRET,
+  trustedOrigins: [config.auth.trustedOrigin],
+  appName: config.auth.appName,
+  secret: config.auth.secret,
 
   emailAndPassword: {
     enabled: true,
@@ -53,14 +54,14 @@ export const auth = betterAuth({
   },
   socialProviders: {
     google: {
-      clientId: process.env.GOOGLE_CLIENT_ID as string,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      clientId: config.oauth.google.clientId,
+      clientSecret: config.oauth.google.clientSecret,
       accessType: "offline",
       prompt: "select_account consent",
     },
     discord: {
-      clientId: process.env.DISCORD_CLIENT_ID as string,
-      clientSecret: process.env.DISCORD_CLIENT_SECRET,
+      clientId: config.oauth.discord.clientId,
+      clientSecret: config.oauth.discord.clientSecret,
       scope: ["identify", "email", "openid"],
     }
   },
@@ -106,9 +107,9 @@ export const auth = betterAuth({
       }
     }),
     passkey({
-      rpID: process.env.RP_ID || "localhost",
-      rpName: process.env.RP_NAME || "Better Auth Demo App",
-      origin: process.env.TRUSTED_ORIGIN || "http://localhost:4200",
+      rpID: config.passkey.rpId,
+      rpName: config.passkey.rpName,
+      origin: config.auth.trustedOrigin,
     }),
     magicLink({
       sendMagicLink: async ({email, url}) => {

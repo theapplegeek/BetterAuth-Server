@@ -1,9 +1,29 @@
-import { Hono } from 'hono'
+import {Context, Hono} from 'hono'
+import {cors} from "hono/dist/types/middleware/cors";
+import {config} from "./config/app.config";
+import {auth} from "./auth/auth";
 
 const app = new Hono()
 
-app.get('/', (c) => {
-  return c.text('Hello Hono!')
-})
+app.use(
+  "/api/*",
+  cors({
+    origin: config.auth.trustedOrigin,
+    allowHeaders: ["Content-Type", "Authorization"],
+    allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    maxAge: 600,
+    credentials: true
+  })
+);
 
-export default app
+// Mount Better Auth handler
+app.on(["GET", "POST"], "/api/auth/*", (c: Context) => {
+  return auth.handler(c.req.raw);
+});
+
+app.get("/health", (c) => c.json({ok: true}));
+
+export default {
+  port: config.server.port,
+  fetch: app.fetch,
+}
