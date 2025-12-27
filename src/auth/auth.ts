@@ -8,6 +8,9 @@ import * as schema from "../db/schema/auth-schema";
 import {ac, admin, user} from "./permissions";
 import {createAuthMiddleware} from "better-auth/api";
 import {config} from "../config/app.config";
+import {RoleDto} from "../admin/dto/role.dto";
+import {getAuthoritiesByUserIds} from "../admin/service/list-users.service";
+import {PermissionDto} from "../admin/dto/permission.dto";
 
 async function sendEmail(to: string, subject: string, html: string) {
   // TODO: plug in nodemailer/resend here
@@ -129,6 +132,19 @@ export const auth = betterAuth({
       },
       jwt: {
         expirationTime: "3m",
+        definePayload: async ({user}) => {
+          const authorities = await getAuthoritiesByUserIds([user.id]);
+          const roles: string[] = authorities[user.id]?.roles
+            .map((role: RoleDto): string => role.name) || [];
+          const permissions: string[] = authorities[user.id]?.permissions
+            .map((permission: PermissionDto): string => permission.code) || [];
+
+          return {
+            ...user,
+            roles: roles,
+            permissions: permissions,
+          }
+        }
       }
     }),
     adminPlugin({

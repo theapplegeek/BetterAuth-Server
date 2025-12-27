@@ -2,6 +2,7 @@ import {type Context, Hono} from 'hono'
 import {config} from "./config/app.config";
 import {auth} from "./auth/auth";
 import {cors} from "hono/cors";
+import adminController from "./admin/controller/admin.controller";
 
 const app = new Hono()
 
@@ -20,6 +21,8 @@ app.use(
 app.on(["GET", "POST"], "/api/auth/*", (c: Context) => {
   return auth.handler(c.req.raw);
 });
+
+app.route("/api/admin", adminController);
 
 app.get("/health", (c) => c.json({ok: true}));
 
