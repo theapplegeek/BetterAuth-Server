@@ -1,24 +1,26 @@
 #!/bin/sh
 set -e
 
+MIGRATION_DIR="/app/migration"
+
 echo "========================================"
 echo "Starting container"
 echo "========================================"
 
-echo "Running database migrations..."
-if [ ! -d "/app/migration" ]; then
-  echo "ERROR: /app/migration not found"
+if [ ! -d "$MIGRATION_DIR" ]; then
+  echo "ERROR: $MIGRATION_DIR not found"
   exit 1
 fi
-cd /app/migration
-bunx drizzle-kit migrate
-echo ""
-echo "Migrations completed successfully"
+
+echo "Running migrations with advisory lock..."
+cd "$MIGRATION_DIR"
+
+bun run run-migrations.ts
 
 cd /app
+
 echo "Cleaning up migration files..."
-rm -rf /app/migration
-echo "Cleanup completed"
+rm -rf "$MIGRATION_DIR"
 
 echo "Starting application..."
 exec bun run dist/index.js
