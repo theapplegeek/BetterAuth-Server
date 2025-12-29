@@ -1,6 +1,7 @@
 services:
   db:
     image: postgres:18-alpine
+    container_name: better-auth-db
     environment:
       POSTGRES_USER: app
       POSTGRES_PASSWORD: app
@@ -9,5 +10,17 @@ services:
       - "5432:5432"
     volumes:
       - db-data:/var/lib/postgresql/data
+
+  app:
+    build: .
+    container_name: better-auth-server
+    env_file:
+      - .env
+    environment:
+      - DATABASE_URL=postgres://app:app@db:5432/betterauth
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
 volumes:
   db-data:
