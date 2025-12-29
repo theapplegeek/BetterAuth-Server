@@ -41,17 +41,21 @@ export const createRole = async (c: Context) => {
         })
         .returning();
 
+      if (!result || result.length === 0) {
+        throw new Error("Role creation failed");
+      }
+
       for (const id of body.permissionIds || []) {
         await tx
           .insert(rolePermission)
           .values({
-            roleId: result[0].id,
+            roleId: result[0]!.id,
             permissionId: id
           });
       }
     });
 
-    return c.json({id: result[0].id}, 200);
+    return c.json({id: result[0]!.id}, 200);
   } catch (error) {
     return c.json({message: "Error creating role"}, 500);
   }

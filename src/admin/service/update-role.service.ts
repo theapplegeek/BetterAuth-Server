@@ -14,7 +14,7 @@ export const updateRole = async (c: Context) => {
     .from(role)
     .where(eq(role.id, roleId));
 
-  if (roleToUpdate.length === 0) {
+  if (!roleToUpdate || roleToUpdate.length === 0) {
     return c.json({message: "Role not found"}, 404);
   }
 
@@ -31,8 +31,8 @@ export const updateRole = async (c: Context) => {
   }
 
   const data = {
-    name: body.name ?? roleToUpdate[0].name,
-    description: body.description ?? roleToUpdate[0].description,
+    name: body.name ?? roleToUpdate[0]!.name,
+    description: body.description ?? roleToUpdate[0]!.description,
   }
 
   try {
@@ -43,6 +43,10 @@ export const updateRole = async (c: Context) => {
         .set(data)
         .where(eq(role.id, roleId))
         .returning();
+
+      if (!roleUpdated || roleUpdated.length === 0) {
+        throw new Error("Error updating role");
+      }
 
       await tx
         .delete(rolePermission)
@@ -58,7 +62,7 @@ export const updateRole = async (c: Context) => {
       }
     });
 
-    return c.json({id: roleUpdated[0].id}, 200);
+    return c.json({id: roleUpdated[0]!.id}, 200);
   } catch (error) {
     return c.json({message: "Error updating role"}, 500);
   }

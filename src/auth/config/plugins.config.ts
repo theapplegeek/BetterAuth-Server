@@ -5,11 +5,10 @@ import {ac, admin, user} from "../permissions";
 import {getAuthoritiesByUserIds} from "../../admin/service/list-users.service";
 import type {RoleDto} from "../../admin/dto/role.dto";
 import type {PermissionDto} from "../../admin/dto/permission.dto";
-import type {BetterAuthOptions} from "better-auth";
 
 import {sendEmail} from "../../utils/email.utils.ts";
 
-export const pluginsConfig: BetterAuthOptions['plugins'] = [
+export const TwoFactorPlugin =
   twoFactor({
     issuer: "Better Auth Demo",
     totpOptions: {
@@ -19,12 +18,16 @@ export const pluginsConfig: BetterAuthOptions['plugins'] = [
       amount: 10,
       length: 8
     }
-  }),
+  });
+
+export const PasskeyPlugin =
   passkey({
     rpID: config.passkey.rpId,
     rpName: config.passkey.rpName,
     origin: config.auth.trustedOrigin,
-  }),
+  });
+
+export const MagicLinkPlugin =
   magicLink({
     sendMagicLink: async ({email, url}: {
       email: string;
@@ -36,7 +39,9 @@ export const pluginsConfig: BetterAuthOptions['plugins'] = [
         `Click the link to sign in: ${url}`
       );
     }
-  }),
+  });
+
+export const JwtPlugin =
   jwt({
     jwks: {
       jwksPath: "/.well-known/jwks.json",
@@ -60,7 +65,9 @@ export const pluginsConfig: BetterAuthOptions['plugins'] = [
         }
       }
     }
-  }),
+  });
+
+export const AdminPlugin =
   adminPlugin({
     defaultRole: "user",
     allowImpersonatingAdmins: true,
@@ -70,4 +77,3 @@ export const pluginsConfig: BetterAuthOptions['plugins'] = [
       user
     },
   })
-];

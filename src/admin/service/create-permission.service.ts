@@ -30,7 +30,11 @@ export const createPermission = async (c: Context) => {
           description: body.description
         }).returning();
 
-    return c.json({ id: result[0].id }, 200);
+    if (!result || result.length === 0) {
+      return c.json({ message: "Error creating permission" }, 500);
+    }
+
+    return c.json({ id: result[0]!.id }, 200);
   } catch (error) {
     return c.json({ message: "Error creating permission" }, 500);
   }
