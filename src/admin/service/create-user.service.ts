@@ -8,7 +8,7 @@ import {eq} from "drizzle-orm";
 import {config} from "../../config/app.config";
 
 export const createUser = async (c: Context) => {
-  const body: UserCreationDto = await c.req.json();
+  const body: UserCreationDto = c.req.valid("json" as never);
 
   if (body.roleIds) {
     for (const id of body.roleIds) {
@@ -62,8 +62,10 @@ export const createUser = async (c: Context) => {
 
     return c.json({userId: result.user.id}, 200);
   } catch (error: any) {
+    console.error(error);
+
     if (error.statusCode && error.body) {
-      return c.json({message: "User creation failed"}, error.statusCode);
+      return c.json(error.body, error.statusCode);
     }
 
     if (result && result.user && result.user.id) {
@@ -75,7 +77,6 @@ export const createUser = async (c: Context) => {
       })
     }
 
-    console.error(error);
     return c.json({message: "Internal server error"}, 500);
   }
 }

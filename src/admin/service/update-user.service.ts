@@ -10,7 +10,7 @@ import {config} from "../../config/app.config";
 
 export const updateUser = async (c: Context) => {
   const userId: string = c.req.param("userId");
-  const body: UserCreationDto = await c.req.json();
+  const body: UserCreationDto = c.req.valid("json" as never);
 
   const users = await db.select()
     .from(user)

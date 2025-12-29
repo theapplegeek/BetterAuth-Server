@@ -10,32 +10,42 @@ import type {PermissionDto} from "../dto/permission.dto";
 export const listUsers = async (c: Context) => {
   const query: Record<string, string> = c.req.query();
 
-  let result: {
-    users: UserWithRole[]
-    total: number
-    limit: number | undefined
-    offset: number | undefined
-  } | {
-    users: never[]
-    total: number
-  } = await auth.api.listUsers({
-    query: query,
-    headers: c.req.header()
-  });
+  try {
+    let result: {
+      users: UserWithRole[]
+      total: number
+      limit: number | undefined
+      offset: number | undefined
+    } | {
+      users: never[]
+      total: number
+    } = await auth.api.listUsers({
+      query: query,
+      headers: c.req.header()
+    });
 
-  const userIds: string[] = result.users.map((u: UserWithRole): string => u.id);
-  const authorities = await getAuthoritiesByUserIds(userIds);
+    const userIds: string[] = result.users.map((u: UserWithRole): string => u.id);
+    const authorities = await getAuthoritiesByUserIds(userIds);
 
-  const usersWithRolesAndPermissions = result.users.map(user => ({
-    ...user,
-    roles: authorities[user.id]?.roles ?? [],
-    permissions: authorities[user.id]?.permissions ?? [],
-  }));
+    const usersWithRolesAndPermissions = result.users.map(user => ({
+      ...user,
+      roles: authorities[user.id]?.roles ?? [],
+      permissions: authorities[user.id]?.permissions ?? [],
+    }));
 
-  return c.json({
-    ...result,
-    users: usersWithRolesAndPermissions,
-  });
+    return c.json({
+      ...result,
+      users: usersWithRolesAndPermissions,
+    });
+  } catch (error: any) {
+    console.error(error);
+
+    if (error.statusCode && error.body) {
+      return c.json(error.body, error.statusCode);
+    }
+
+    return c.json({message: "Internal server error"}, 500);
+  }
 }
 
 export const getAuthoritiesByUserIds = async (userIds: string[]) => {

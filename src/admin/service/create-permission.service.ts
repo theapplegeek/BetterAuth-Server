@@ -5,7 +5,7 @@ import { db } from "../../db/db";
 import { permission } from "../../db/schema/rbac-schema";
 
 export const createPermission = async (c: Context) => {
-  const body: permissionCreationDto = await c.req.json();
+  const body: permissionCreationDto = c.req.valid("json" as never);
 
   const permissions =
     await db

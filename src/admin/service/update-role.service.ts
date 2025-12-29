@@ -6,8 +6,8 @@ import {eq} from "drizzle-orm";
 import type {RoleDto} from "../dto/role.dto";
 
 export const updateRole = async (c: Context) => {
-  const body: RoleCreationDto = await c.req.json();
-  const roleId: number = Number(c.req.param("roleId"));
+  const body: RoleCreationDto = c.req.valid("json" as never);
+  const { roleId }: {roleId: number} = c.req.valid("param" as never);
 
   const roleToUpdate = await db
     .select()

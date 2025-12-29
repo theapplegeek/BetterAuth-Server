@@ -6,7 +6,7 @@ import type {Context} from "hono";
 import type {RoleDto} from "../dto/role.dto";
 
 export const createRole = async (c: Context) => {
-  const body: RoleCreationDto = await c.req.json();
+  const body: RoleCreationDto = c.req.valid("json" as never);
 
   const roles = await db
     .select()

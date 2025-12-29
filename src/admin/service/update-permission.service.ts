@@ -6,8 +6,8 @@ import { permission } from "../../db/schema/rbac-schema";
 import type { PermissionDto } from "../dto/permission.dto";
 
 export const updatePermission = async (c: Context) => {
-  const body: permissionCreationDto = await c.req.json();
-  const permissionId: number = Number(c.req.param("permissionId"));
+  const body: permissionCreationDto = c.req.valid("json" as never);
+  const { permissionId }: {permissionId: number} = c.req.valid("param" as never);
 
   const permissionToUpdate =
     await db
