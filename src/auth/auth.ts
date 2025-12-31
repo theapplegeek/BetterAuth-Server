@@ -9,6 +9,10 @@ import {userConfig} from "./config/user.config";
 import {hooksConfig} from "./config/hooks.config";
 import {emailAndPasswordConfig} from "./config/email-and-password.config.ts";
 import {AdminPlugin, JwtPlugin, MagicLinkPlugin, PasskeyPlugin, TwoFactorPlugin} from "./config/plugins.config.ts";
+import {customSession} from "better-auth/plugins";
+import {getAuthoritiesByUserIds} from "../admin/service/list-users.service.ts";
+import type {RoleDto} from "../admin/dto/role.dto.ts";
+import type {PermissionDto} from "../admin/dto/permission.dto.ts";
 
 export const auth = betterAuth({
   database: databaseConfig,
@@ -27,6 +31,22 @@ export const auth = betterAuth({
     MagicLinkPlugin,
     JwtPlugin,
     AdminPlugin,
+    customSession(async ({ user, session }) => {
+      const authorities = await getAuthoritiesByUserIds([user.id]);
+      const roles: string[] = authorities[user.id]?.roles
+        .map((role: RoleDto): string => role.name) || [];
+      const permissions: string[] = authorities[user.id]?.permissions
+        .map((permission: PermissionDto): string => permission.code) || [];
+
+      return {
+        user: {
+          ...user,
+          roles: roles,
+          permissions: permissions
+        },
+        session
+      };
+    }),
   ],
   hooks: hooksConfig,
 });
