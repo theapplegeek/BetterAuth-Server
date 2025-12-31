@@ -29,6 +29,8 @@ export const PasskeyPlugin =
 
 export const MagicLinkPlugin =
   magicLink({
+    expiresIn: 300,
+    storeToken: "hashed",
     sendMagicLink: async ({email, url}: {
       email: string;
       url: string;
