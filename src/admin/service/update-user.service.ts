@@ -62,14 +62,20 @@ export const updateUser = async (c: Context) => {
         .where(eq(userRole.userId, userId));
 
       if (body.roleIds) {
-        await tx
-          .insert(userRole)
-          .values(body.roleIds!.map((id: number) => {
-            return {
-              userId: userId,
-              roleId: id
-            }
-          }));
+        if (body.roleIds.length > 0) {
+          await tx
+            .insert(userRole)
+            .values(body.roleIds!.map((id: number) => {
+              return {
+                userId: userId,
+                roleId: id
+              }
+            }));
+        } else {
+          await tx
+            .delete(userRole)
+            .where(eq(userRole.userId, userId));
+        }
       }
     });
 
