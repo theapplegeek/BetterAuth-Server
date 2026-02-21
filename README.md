@@ -1,9 +1,9 @@
 # better-auth-server
 
-Backend API basato su [Hono](https://hono.dev), [Better Auth](https://www.better-auth.com) e [Drizzle ORM](https://orm.drizzle.team) con database PostgreSQL.
+Backend API basato su [Hono](https://hono.dev), [BetterAuth](https://www.better-auth.com) e [Drizzle ORM](https://orm.drizzle.team) con database PostgreSQL.
 
 Espone:
-- endpoint auth sotto `/api/auth/*` (gestiti da Better Auth + plugin)
+- endpoint auth sotto `/api/auth/*` (gestiti da BetterAuth + plugin)
 - endpoint admin custom sotto `/api/admin/*` (RBAC, utenti, ruoli, permessi)
 - healthcheck su `/health`
 
@@ -11,7 +11,7 @@ Espone:
 
 - Runtime: Bun
 - Framework HTTP: Hono
-- Auth framework: Better Auth
+- Auth framework: BetterAuth
 - ORM: Drizzle ORM
 - DB: PostgreSQL
 - Validazione input: Valibot (`@hono/standard-validator`)
@@ -26,7 +26,7 @@ Espone:
   - 2FA (TOTP + backup codes)
   - JWT con JWKS
 - Gestisce autorizzazioni in due livelli:
-  - `user.role` (campo utente Better Auth, usato dal middleware admin)
+  - `user.role` (campo utente BetterAuth, usato dal middleware admin)
   - RBAC custom (`role`, `permission`, `user_role`, `role_permission`)
 - Arricchisce sessione/JWT con ruoli e permessi provenienti dalle tabelle RBAC custom.
 
@@ -58,8 +58,8 @@ DATABASE_URL=postgres://app:app@localhost:5432/betterauth
 TRUSTED_ORIGIN=http://localhost:4200
 
 RP_ID=localhost
-RP_NAME=Better Auth Demo App
-APP_NAME=Better Auth Demo
+RP_NAME=BetterAuth Demo App
+APP_NAME=BetterAuth Demo
 
 GOOGLE_CLIENT_ID=
 GOOGLE_CLIENT_SECRET=
@@ -69,7 +69,7 @@ DISCORD_CLIENT_SECRET=
 
 Variabili supportate dal codice:
 
-- `AUTH_SECRET`: secret Better Auth
+- `AUTH_SECRET`: secret BetterAuth
 - `BETTER_AUTH_URL`: URL base backend
 - `DATABASE_URL`: connessione PostgreSQL
 - `TRUSTED_ORIGIN`: origin frontend consentita CORS/trusted origins
@@ -79,7 +79,7 @@ Variabili supportate dal codice:
 - `DISCORD_CLIENT_ID`, `DISCORD_CLIENT_SECRET`: OAuth Discord
 
 Nota email:
-- Esistono variabili SMTP in `.env.example`, ma `src/utils/email.utils.ts` è uno stub e logga a console (`SEND EMAIL`) finché non integri un provider reale.
+- `src/utils/email.utils.ts` invia email via SMTP usando `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS` e `MAIL_FROM`.
 
 ## Avvio progetto
 
@@ -134,7 +134,7 @@ just db-check
 ## Database e migrazioni
 
 Schema in:
-- `src/db/schema/auth-schema.ts` (tabelle Better Auth)
+- `src/db/schema/auth-schema.ts` (tabelle BetterAuth)
 - `src/db/schema/rbac-schema.ts` (ruoli/permessi custom)
 
 Migrations SQL in `drizzle/`.
@@ -143,7 +143,7 @@ Migrations SQL in `drizzle/`.
 
 ## Autenticazione (`/api/auth/*`)
 
-Gli endpoint auth sono forniti dal runtime Better Auth e montati con:
+Gli endpoint auth sono forniti dal runtime BetterAuth e montati con:
 - `GET/POST /api/auth/*`
 
 Plugin attivi:
@@ -173,7 +173,7 @@ Tutti gli endpoint:
 Lista utenti (query inoltrata a `auth.api.listUsers`).
 
 Risposta:
-- payload Better Auth + arricchimento:
+- payload BetterAuth + arricchimento:
   - `users[].roles` (oggetti ruolo RBAC)
   - `users[].permissions` (oggetti permesso RBAC deduplicati)
 
@@ -185,7 +185,7 @@ Codici:
 
 #### `POST /api/admin/user`
 
-Crea utente via Better Auth + associazioni RBAC (`user_role`).
+Crea utente via BetterAuth + associazioni RBAC (`user_role`).
 
 Body:
 
@@ -342,6 +342,6 @@ Risposta:
 ## Note operative importanti
 
 - CORS è applicato su `/api/*` con `origin = TRUSTED_ORIGIN` e `credentials: true`.
-- Le chiamate admin richiedono cookie/sessione Better Auth validi.
+- Le chiamate admin richiedono cookie/sessione BetterAuth validi.
 - Per bootstrap iniziale, serve almeno un utente con `user.role = "admin"` (campo tabella `user`) per accedere alle API admin.
-- Le email sono solo loggate finché non implementi `sendEmail` con provider reale.
+- Le email vengono inviate via SMTP; configura correttamente le variabili `SMTP_*` e `MAIL_FROM`.

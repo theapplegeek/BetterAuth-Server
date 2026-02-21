@@ -10,7 +10,7 @@ import {sendEmail} from "../../utils/email.utils.ts";
 
 export const TwoFactorPlugin =
   twoFactor({
-    issuer: "Better Auth Demo",
+    issuer: "BetterAuth Demo",
     totpOptions: {
       digits: 6,
     },

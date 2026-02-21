@@ -4,7 +4,7 @@ export const config = {
   auth: {
     secret: process.env.AUTH_SECRET!,
     trustedOrigin: process.env.TRUSTED_ORIGIN!,
-    appName: process.env.APP_NAME || "Better Auth Demo",
+    appName: process.env.APP_NAME || "BetterAuth Demo",
     url: process.env.BETTER_AUTH_URL!,
   },
   database: {
@@ -22,7 +22,7 @@ export const config = {
   },
   passkey: {
     rpId: process.env.RP_ID || "localhost",
-    rpName: process.env.RP_NAME || "Better Auth Demo App",
+    rpName: process.env.RP_NAME || "BetterAuth Demo App",
   },
   server: {
     port: Number(process.env.PORT) || 3000,

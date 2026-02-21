@@ -17,7 +17,7 @@ app.use(
   })
 );
 
-// Mount Better Auth handler
+// Mount BetterAuth handler
 app.on(["GET", "POST"], "/api/auth/*", (c: Context) => {
   return auth.handler(c.req.raw);
 });
