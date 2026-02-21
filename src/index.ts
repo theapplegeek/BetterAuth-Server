@@ -3,6 +3,7 @@ import {config} from "./config/app.config";
 import {auth} from "./auth/auth";
 import {cors} from "hono/cors";
 import adminController from "./admin/controller/admin.controller";
+import {toNeutralChangeEmailResponse} from "./auth/change-email-response";
 
 const app = new Hono()
 
@@ -18,8 +19,9 @@ app.use(
 );
 
 // Mount BetterAuth handler
-app.on(["GET", "POST"], "/api/auth/*", (c: Context) => {
-  return auth.handler(c.req.raw);
+app.on(["GET", "POST"], "/api/auth/*", async (c: Context) => {
+  const response = await auth.handler(c.req.raw);
+  return toNeutralChangeEmailResponse(c.req.path, response);
 });
 
 app.route("/api/admin", adminController);
