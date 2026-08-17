@@ -13,6 +13,7 @@ import {customSession} from "better-auth/plugins";
 import {getAuthoritiesByUserIds} from "../admin/service/list-users.service.ts";
 import type {RoleDto} from "../admin/dto/role.dto.ts";
 import type {PermissionDto} from "../admin/dto/permission.dto.ts";
+import { expo } from "@better-auth/expo";
 
 export const auth = betterAuth({
   database: databaseConfig,
@@ -31,6 +32,7 @@ export const auth = betterAuth({
     MagicLinkPlugin,
     JwtPlugin,
     AdminPlugin,
+    expo(),
     customSession(async ({ user, session }) => {
       const authorities = await getAuthoritiesByUserIds([user.id]);
       const roles: string[] = authorities[user.id]?.roles
@@ -49,4 +51,10 @@ export const auth = betterAuth({
     }),
   ],
   hooks: hooksConfig,
+  advanced: {
+    defaultCookieAttributes: {
+      sameSite: "none",
+      secure: true,
+    },
+  }
 });
